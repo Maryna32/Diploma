@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") 
+}
+
+enum MediaType {
+  BOOK
+  MOVIE
+  SERIES
+  COURSE
+  PODCAST
+  CUSTOM
+}
+
+enum StatusType {
+  TO_CONSUME
+  IN_PROGRESS
+  COMPLETED
+  DROPPED
+}
+
+model User {
+  id String  @id
+  email String @unique
+  username String @unique
+  name String?
+  avatarUrl String?
+  bio String?
+  
+
+  logEntries LogEntry[]
+  comments Comment[]
+  
+  followers Follows[] @relation("Followers") // На кого підписаний 
+  following Follows[] @relation("Following") // Хто підписаний 
+}
+
+model LogEntry {
+  id              Int            @id @default(autoincrement())
+  userId          String         
+  title           String
+  mediaType       MediaType      // Enum: BOOK, MOVIE, COURSE, etc.
+  status          StatusType     // Enum: TO_READ, IN_PROGRESS, COMPLETED
+  rating          Int?           @map("user_rating") // Оцінка
+  notes           String?        @db.Text
+  isPublic        Boolean        @default(false)
+
+
+  user User @relation(fields: [userId], references: [id])
+  comments Comment[]
+  
+  createdAt DateTime @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  userId String        
+  logEntryId Int  
+  content String  @db.Text
+
+  user User @relation(fields: [userId], references: [id])
+  logEntry LogEntry @relation(fields: [logEntryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Follows {
+  followerId String
+  followingId String
+
+  follower User @relation("Following", fields: [followerId], references: [id])
+  following User  @relation("Followers", fields: [followingId], references: [id])
+
+  createdAt DateTime  @default(now())
+
+  @@id([followerId, followingId])
+  @@map("follows") 
+}
