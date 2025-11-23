@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "TraceLog",
@@ -18,10 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
           {children}
-        </>
+        </ThemeProvider>
       </body>
     </html>
   );

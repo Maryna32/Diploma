@@ -21,7 +21,7 @@ function LinksDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex gap-4 max-w-[100px]">
+        <Button variant="ghost" className="flex gap-4 max-w-[100px]">
           <EllipsisVertical className="w-6 h-6" />
           <User />
         </Button>
