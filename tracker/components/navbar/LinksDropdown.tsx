@@ -7,43 +7,68 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { links } from "../../utlis/links";
-import { User } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
-const logOut = () => {
-  console.log("Log out!");
+type LinksDropdownProps = {
+  user: any;
 };
 
-function LinksDropdown() {
+function LinksDropdown({ user }: LinksDropdownProps) {
+  const router = useRouter();
+
+  const logOut = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+  };
+
+  const visibleLinks = links.filter((link) => {
+    if (link.isPublic) return true;
+    return user !== null;
+  });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex gap-4 max-w-[100px]">
-          <EllipsisVertical className="w-6 h-6" />
-          <User />
+        <Button variant="ghost" className="flex gap-2 max-w-[100px]">
+          <EllipsisVertical className="w-5 h-5" />
+          <User className="w-5 h-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40" align="start" sideOffset={10}>
-        {links.map((link) => {
+      <DropdownMenuContent className="w-40" align="end" sideOffset={10}>
+        {visibleLinks.map((link) => {
           return (
-            <DropdownMenuItem key={link.href}>
-              <Link href={link.href} className="capitalize w-full">
+            <DropdownMenuItem key={link.href} asChild>
+              <Link
+                href={link.href}
+                className="capitalize w-full cursor-pointer"
+              >
                 {link.label}
               </Link>
             </DropdownMenuItem>
           );
         })}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <button onClick={logOut} className="w-full text-left">
-            Вийти
-          </button>
-        </DropdownMenuItem>
+
+        {user && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <button
+                onClick={logOut}
+                className="w-full text-left cursor-pointer"
+              >
+                Вийти
+              </button>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
+
 export default LinksDropdown;

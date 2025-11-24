@@ -1,16 +1,31 @@
+"use client";
+
 import { Button } from "../ui/button";
 import { LogIn, LogOut } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
-type TitleBtnProps = {
+type AuthBtnProps = {
   title: string;
 };
 
-function AuthBtn({ title }: TitleBtnProps) {
+function AuthBtn({ title }: AuthBtnProps) {
+  const router = useRouter();
+
+  const handleAuth = async () => {
+    if (title === "Вийти") {
+      await supabase.auth.signOut();
+      router.refresh();
+    } else {
+      router.push("/auth");
+    }
+  };
+
   return (
     <Button
-      className="bg-primary text-primary-foreground"
       variant={title === "Ввійти" ? "default" : "secondary"}
       size="sm"
+      onClick={handleAuth}
     >
       {title === "Ввійти" ? (
         <LogIn className="h-4 w-4" />
