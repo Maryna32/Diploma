@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 
 function QuickAdd() {
   const handleQuickAdd = () => {
-    console.log("Відкрити модальне вікно для додавання запису");
+    console.log("Додавання запису");
   };
 
   return (
