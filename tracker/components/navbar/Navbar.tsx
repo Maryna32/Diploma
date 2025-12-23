@@ -9,9 +9,22 @@ import DarkMode from "./DarkMode";
 
 export default async function Navbar() {
   const supabase = await createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  let fullUserData = null;
+
+  if (user) {
+    const { data: dbUser } = await supabase
+      .from("User")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    fullUserData = dbUser ? { ...user, ...dbUser } : user;
+  }
 
   const authTitle = user === null ? "Ввійти" : "Вийти";
 
@@ -29,7 +42,7 @@ export default async function Navbar() {
           <AuthBtn title={authTitle} />
           <DarkMode />
           {user !== null && <BellNotification />}
-          <LinksDropdown user={user} />
+          <LinksDropdown user={fullUserData} />
         </div>
       </div>
     </header>

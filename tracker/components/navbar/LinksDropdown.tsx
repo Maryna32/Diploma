@@ -31,6 +31,9 @@ function LinksDropdown({ user }: LinksDropdownProps) {
     return user !== null;
   });
 
+  const isAdmin =
+    user?.user_metadata?.role === "ADMIN" || user?.role === "ADMIN";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,18 +43,26 @@ function LinksDropdown({ user }: LinksDropdownProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end" sideOffset={10}>
-        {visibleLinks.map((link) => {
-          return (
-            <DropdownMenuItem key={link.href} asChild>
+        {visibleLinks.map((link) => (
+          <DropdownMenuItem key={link.href} asChild>
+            <Link href={link.href} className="capitalize w-full cursor-pointer">
+              {link.label}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
               <Link
-                href={link.href}
-                className="capitalize w-full cursor-pointer"
+                href="/admin"
+                className="w-full cursor-pointer flex items-center gap-2 text-primary font-medium"
               >
-                {link.label}
+                Адмін-панель
               </Link>
             </DropdownMenuItem>
-          );
-        })}
+          </>
+        )}
 
         {user && (
           <>
@@ -59,7 +70,7 @@ function LinksDropdown({ user }: LinksDropdownProps) {
             <DropdownMenuItem asChild>
               <button
                 onClick={logOut}
-                className="w-full text-left cursor-pointer"
+                className="w-full text-left cursor-pointer text-destructive"
               >
                 Вийти
               </button>
