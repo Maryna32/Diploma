@@ -48,6 +48,7 @@ export default function AuthForm() {
           password,
         });
         if (error) throw error;
+        await fetch("/api/auth/create-user", { method: "POST" });
         router.push("/");
         router.refresh();
       }
