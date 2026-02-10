@@ -1,0 +1,125 @@
+"use client";
+
+import StarRating from "./StarRating";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Textarea } from "../ui/textarea";
+import { Checkbox } from "../ui/checkbox";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
+import { useState, useRef } from "react";
+
+function AddLog() {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  return (
+    <div className="min-h-screen flex justify-center pt-8 pb-24">
+      <div className="border grid grid-cols-1 gap-5 p-6 rounded-lg w-full max-w-md">
+        <div>
+          <Label>Введіть назву</Label>
+          <Input
+            autoFocus
+            type="text"
+            placeholder="Назва"
+            maxLength={100}
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Введіть тип</Label>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Тип" />
+            </SelectTrigger>
+            <SelectContent />
+          </Select>
+        </div>
+
+        <div>
+          <Label>Введіть статус</Label>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Статус" />
+            </SelectTrigger>
+            <SelectContent />
+          </Select>
+        </div>
+        <div>
+          <Label>Обкладинка</Label>
+
+          <Input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (!f) return;
+
+              setFile(f);
+              setPreview(URL.createObjectURL(f));
+            }}
+          />
+
+          {preview && (
+            <div className="mt-3 relative w-32">
+              <img
+                src={preview}
+                className="w-32 h-48 object-cover rounded-md"
+              />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFile(null);
+                  setPreview(null);
+
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                  }
+                }}
+                className="absolute -top-2 -right-2 bg-black/70 text-white
+                   rounded-full w-6 h-6 flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+        </div>
+        <div>
+          <Label>Оцінка</Label>
+          <StarRating />
+        </div>
+
+        <div>
+          <Label>Примітка</Label>
+          <Textarea maxLength={500} />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Checkbox id="public" />
+          <Label htmlFor="public">Чи публічний запис?</Label>
+        </div>
+
+        <div className="flex gap-3 justify-end">
+          <Button variant="outline" onClick={() => router.push("/my-log")}>
+            Назад
+          </Button>
+          <Button>Зберегти</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default AddLog;
