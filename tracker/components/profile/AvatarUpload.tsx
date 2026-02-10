@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 type AvatarUploadProps = {
   currentUrl: string | null;
   onUpload: (url: string) => void;
+  onRemove: () => void;
   initials: string;
 };
 
@@ -15,6 +16,7 @@ export default function AvatarUpload({
   currentUrl,
   onUpload,
   initials,
+  onRemove,
 }: AvatarUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -127,7 +129,7 @@ export default function AvatarUpload({
         className={cn(
           "relative group cursor-pointer transition-transform",
           isDragging && "scale-105 ring-4 ring-primary ring-offset-2",
-          isUploading && "cursor-not-allowed"
+          isUploading && "cursor-not-allowed",
         )}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -144,7 +146,7 @@ export default function AvatarUpload({
           className={cn(
             "absolute inset-0 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none",
             isDragging && "opacity-100 bg-primary/60",
-            isUploading && "opacity-100"
+            isUploading && "opacity-100",
           )}
         >
           {isUploading ? (
@@ -172,6 +174,20 @@ export default function AvatarUpload({
           PNG, JPG, GIF до 2MB
         </p>
       </div>
+      {currentUrl && !isUploading && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!confirm("Видалити фото профілю?")) return;
+            onRemove();
+            setPreviewUrl(null);
+          }}
+          className="text-xs text-destructive hover:underline"
+        >
+          Видалити фото
+        </button>
+      )}
     </div>
   );
 }

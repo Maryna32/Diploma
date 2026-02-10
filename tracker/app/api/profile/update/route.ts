@@ -15,6 +15,14 @@ export async function POST(request: Request) {
 
     const { username, name, bio, avatarUrl } = await request.json();
 
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     if (username) {
       const existingUser = await prisma.user.findFirst({
         where: {
@@ -26,8 +34,16 @@ export async function POST(request: Request) {
       if (existingUser) {
         return NextResponse.json(
           { error: "Username вже зайнятий" },
-          { status: 400 }
+          { status: 400 },
         );
+      }
+    }
+
+    if (dbUser.avatarUrl && dbUser.avatarUrl !== avatarUrl) {
+      const path = dbUser.avatarUrl.split("/avatars/")[1];
+
+      if (path) {
+        await supabase.storage.from("avatars").remove([path]);
       }
     }
 
@@ -46,7 +62,7 @@ export async function POST(request: Request) {
     console.error("Error updating profile:", error);
     return NextResponse.json(
       { error: "Failed to update profile" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

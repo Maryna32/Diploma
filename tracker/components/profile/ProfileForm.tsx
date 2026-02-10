@@ -126,6 +126,7 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
           <AvatarUpload
             currentUrl={avatarUrl}
             onUpload={(url) => setAvatarUrl(url)}
+            onRemove={() => setAvatarUrl("")}
             initials={getInitials()}
           />
 
