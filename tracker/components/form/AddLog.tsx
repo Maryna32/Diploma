@@ -1,4 +1,6 @@
 "use client";
+import { mediaTypeOptions, statusTypeOptions } from "@/lib/translations";
+import { MediaType, StatusType } from "@/lib/generated/prisma";
 
 import StarRating from "./StarRating";
 import { Input } from "../ui/input";
@@ -21,6 +23,8 @@ function AddLog() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<MediaType | undefined>();
+  const [status, setStatus] = useState<StatusType | undefined>();
 
   return (
     <div className="min-h-screen flex justify-center pt-8 pb-24">
@@ -38,21 +42,41 @@ function AddLog() {
 
         <div>
           <Label>Введіть тип</Label>
-          <Select>
+          <Select
+            value={mediaType}
+            onValueChange={(value) => setMediaType(value as MediaType)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Тип" />
             </SelectTrigger>
-            <SelectContent />
+
+            <SelectContent>
+              {mediaTypeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label>Введіть статус</Label>
-          <Select>
+          <Select
+            value={status}
+            onValueChange={(value) => setStatus(value as StatusType)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Статус" />
             </SelectTrigger>
-            <SelectContent />
+
+            <SelectContent>
+              {statusTypeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
         <div>
