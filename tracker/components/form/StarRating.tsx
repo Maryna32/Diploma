@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Props = {
   value?: number;
@@ -9,6 +9,10 @@ type Props = {
 
 export default function StarRating({ value = 0, onChange }: Props) {
   const [rating, setRating] = useState(value);
+
+  useEffect(() => {
+    setRating(value);
+  }, [value]);
 
   const handleClick = (v: number) => {
     setRating(v);
@@ -23,9 +27,11 @@ export default function StarRating({ value = 0, onChange }: Props) {
           onClick={() => handleClick(star)}
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
-          className={`w-6 h-6 cursor-pointer transition-colors
-            ${star <= rating ? "fill-yellow-400" : "fill-transparent stroke-yellow-400"}
-          `}
+          className={`w-6 h-6 cursor-pointer transition-colors ${
+            star <= rating
+              ? "fill-yellow-400"
+              : "fill-transparent stroke-yellow-400"
+          }`}
         >
           <path
             strokeWidth="2"

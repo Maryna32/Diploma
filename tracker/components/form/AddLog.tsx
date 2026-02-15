@@ -25,6 +25,64 @@ function AddLog() {
   const [preview, setPreview] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<MediaType | undefined>();
   const [status, setStatus] = useState<StatusType | undefined>();
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+  const [rating, setRating] = useState<number | undefined>(undefined);
+  const [isPublic, setIsPublic] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!title || !mediaType || !status) {
+      alert("Заповніть обов'язкові поля");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      let coverUrl: string | undefined;
+      if (file) {
+        coverUrl = await uploadFile(file);
+      }
+
+      const response = await fetch("/api/logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          mediaType,
+          status,
+          rating,
+          notes,
+          isPublic,
+          coverUrl,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Помилка");
+
+      router.push("/my-log");
+    } catch (error) {
+      alert("Не вдалося зберегти");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/upload/cover", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Upload failed");
+
+    return data.url;
+  };
 
   return (
     <div className="min-h-screen flex justify-center pt-8 pb-24">
@@ -36,6 +94,8 @@ function AddLog() {
             type="text"
             placeholder="Назва"
             maxLength={100}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             required
           />
         </div>
@@ -122,16 +182,24 @@ function AddLog() {
         </div>
         <div>
           <Label>Оцінка</Label>
-          <StarRating />
+          <StarRating value={rating} onChange={setRating} />
         </div>
 
         <div>
           <Label>Примітка</Label>
-          <Textarea maxLength={500} />
+          <Textarea
+            maxLength={500}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          <Checkbox id="public" />
+          <Checkbox
+            id="public"
+            checked={isPublic}
+            onCheckedChange={(v) => setIsPublic(!!v)}
+          />
           <Label htmlFor="public">Чи публічний запис?</Label>
         </div>
 
@@ -139,7 +207,9 @@ function AddLog() {
           <Button variant="outline" onClick={() => router.push("/my-log")}>
             Назад
           </Button>
-          <Button>Зберегти</Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? "Збереження..." : "Зберегти"}
+          </Button>
         </div>
       </div>
     </div>
