@@ -5,13 +5,16 @@ import LogCard from "./LogCard";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { mediaTypeOptions } from "@/lib/translations";
+import { LogEntry } from "@/lib/generated/prisma";
 
 export default function MyLogList() {
   const router = useRouter();
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<"all" | LogEntry["mediaType"]>(
+    "all",
+  );
 
   useEffect(() => {
     fetchLogs();
@@ -26,7 +29,7 @@ export default function MyLogList() {
         throw new Error("Не вдалося завантажити записи");
       }
 
-      const data = await response.json();
+      const data: LogEntry[] = await response.json();
       setLogs(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Помилка завантаження");
