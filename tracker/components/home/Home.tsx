@@ -2,6 +2,7 @@ import PopularLogs from "./PopularLogs";
 import PopularPeople from "./PopularPeople";
 import SubscriptionRecords from "./SubscriptionRecords";
 import { headers } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 
 async function getRecomendationData() {
   const headersList = headers();
@@ -21,10 +22,13 @@ async function getRecomendationData() {
 
 export default async function Home() {
   const data = await getRecomendationData();
-
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return (
     <div className="min-h-screen px-4 py-8">
-      <SubscriptionRecords />
+      {user && <SubscriptionRecords />}
       <PopularLogs logs={data.popularLogs} />
       <PopularPeople users={data.popularUsers} />
     </div>
