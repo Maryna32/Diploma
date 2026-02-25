@@ -5,9 +5,14 @@ import { useState, useEffect } from "react";
 type Props = {
   value?: number;
   onChange?: (value: number) => void;
+  readOnly?: boolean;
 };
 
-export default function StarRating({ value = 0, onChange }: Props) {
+export default function StarRating({
+  value = 0,
+  onChange,
+  readOnly = false,
+}: Props) {
   const [rating, setRating] = useState(value);
 
   useEffect(() => {
@@ -15,6 +20,7 @@ export default function StarRating({ value = 0, onChange }: Props) {
   }, [value]);
 
   const handleClick = (v: number) => {
+    if (readOnly) return;
     setRating(v);
     onChange?.(v);
   };
@@ -27,7 +33,9 @@ export default function StarRating({ value = 0, onChange }: Props) {
           onClick={() => handleClick(star)}
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
-          className={`w-6 h-6 cursor-pointer transition-colors ${
+          className={`w-6 h-6 transition-colors ${
+            readOnly ? "" : "cursor-pointer"
+          } ${
             star <= rating
               ? "fill-yellow-400"
               : "fill-transparent stroke-yellow-400"

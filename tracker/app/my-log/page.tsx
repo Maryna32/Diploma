@@ -1,5 +1,7 @@
+import MyLogsList from "@/components/list/MyLogsList";
+
 function MyLogPage() {
-  return <div>MyLogPage</div>;
+  return <MyLogsList />;
 }
 
 export default MyLogPage;
