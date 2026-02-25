@@ -7,9 +7,15 @@ import { useRouter } from "next/navigation";
 import { mediaTypeOptions } from "@/lib/translations";
 import { LogEntry } from "@/lib/generated/prisma";
 
+type LogView = Omit<LogEntry, "id" | "createdAt" | "updatedAt"> & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export default function MyLogList() {
   const router = useRouter();
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [logs, setLogs] = useState<LogView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | LogEntry["mediaType"]>(
@@ -30,7 +36,15 @@ export default function MyLogList() {
       }
 
       const data: LogEntry[] = await response.json();
-      setLogs(data);
+
+      const formatted: LogView[] = data.map((log) => ({
+        ...log,
+        id: String(log.id),
+        createdAt: new Date(log.createdAt).toISOString(),
+        updatedAt: new Date(log.updatedAt).toISOString(),
+      }));
+
+      setLogs(formatted);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Помилка завантаження");
     } finally {
