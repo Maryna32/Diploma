@@ -19,15 +19,15 @@ export async function middleware(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const {
@@ -35,16 +35,19 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
+    request.nextUrl.pathname.startsWith(route),
   );
   const isAdminRoute = adminRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
+    request.nextUrl.pathname.startsWith(route),
   );
 
   if (isProtectedRoute && !user) {
     return NextResponse.redirect(new URL("/auth", request.url));
   }
 
+  if (request.nextUrl.pathname === "/auth" && user) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
   if (isAdminRoute) {
     if (!user) {
       return NextResponse.redirect(new URL("/auth", request.url));
@@ -52,17 +55,31 @@ export async function middleware(request: NextRequest) {
 
     const { data: userData } = await supabase
       .from("User")
-      .select("role")
+      .select("role, bannedUntil")
       .eq("id", user.id)
       .single();
+
+    if (userData?.bannedUntil && new Date(userData.bannedUntil) > new Date()) {
+      if (userData.role !== "ADMIN") {
+        return NextResponse.redirect(new URL("/banned", request.url));
+      }
+    }
 
     if (userData?.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
-  if (request.nextUrl.pathname === "/auth" && user) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (isProtectedRoute && user) {
+    const { data: userData } = await supabase
+      .from("User")
+      .select("bannedUntil")
+      .eq("id", user.id)
+      .single();
+
+    if (userData?.bannedUntil && new Date(userData.bannedUntil) > new Date()) {
+      return NextResponse.redirect(new URL("/banned", request.url));
+    }
   }
 
   return response;
