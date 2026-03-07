@@ -1,6 +1,6 @@
 "use client";
 
-import { toggleBan } from "@/app/api/admin/route";
+import { toggleBan } from "@/app/api/admin/actions";
 
 export default function BanCheckbox({
   userId,
