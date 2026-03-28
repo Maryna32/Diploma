@@ -4,6 +4,7 @@ export default function HomePage() {
   return (
     <div>
       <Home />
+      Спробаа
     </div>
   );
 }
