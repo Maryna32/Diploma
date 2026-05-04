@@ -22,6 +22,29 @@ export default function MyLogList() {
     "all",
   );
 
+  const handleEdit = (id: string) => {
+  router.push(`/edit-log/${id}`);
+};
+
+const handleDelete = async (id: string) => {
+  const confirmed = confirm("Ви дійсно хочете видалити запис?");
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(`/api/logs/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Не вдалося видалити запис");
+    }
+
+    setLogs((prev) => prev.filter((log) => log.id !== id));
+  } catch (err) {
+    alert("Помилка при видаленні запису");
+  }
+};
+
   useEffect(() => {
     fetchLogs();
   }, []);
@@ -121,7 +144,7 @@ export default function MyLogList() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredLogs.map((log) => (
-                <LogCard key={log.id} log={log} />
+                <LogCard key={log.id} log={log} onEdit={handleEdit} onDelete={handleDelete}/>
               ))}
             </div>
           </>
