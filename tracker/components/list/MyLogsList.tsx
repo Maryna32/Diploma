@@ -81,7 +81,7 @@ const handleDelete = async (id: string) => {
       : logs.filter((log) => log.mediaType === activeTab);
 
   if (loading) {
-    return <p className="text-gray-500">Завантаження...</p>;
+    return <p className="text-center pt-10 text-gray-500">Завантаження...</p>;
   }
 
   if (error) {
