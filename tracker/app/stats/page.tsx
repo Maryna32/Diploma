@@ -71,9 +71,11 @@ export default async function StatsPage() {
 
   const favoriteType = byType.sort((a, b) => b.count - a.count)[0];
 
-  const uniqueDays = [...new Set(entries.map((e) =>
-    new Date(e.createdAt).toDateString()
-  ))].sort();
+  const uniqueDays = Array.from(
+  new Set(
+    entries.map((e) => new Date(e.createdAt).toDateString())
+  )
+).sort();
 
   let streak = 0;
   let currentStreak = 1;
