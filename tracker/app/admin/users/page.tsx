@@ -32,7 +32,7 @@ export default async function AdminPage() {
                 </td>
                 <td className="p-4 border-b text-center">
                   <div className="flex justify-center items-center">
-                    <BanCheckbox userId={u.id} banned={!!u.bannedUntil} />
+                    <BanCheckbox userId={u.id} banned={!!u.bannedUntil && new Date(u.bannedUntil) > new Date()} />
                   </div>
                 </td>
               </tr>

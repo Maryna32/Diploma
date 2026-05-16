@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import { toggleBan } from "@/app/api/admin/actions";
 
 export default function BanCheckbox({
@@ -9,14 +9,18 @@ export default function BanCheckbox({
   userId: string;
   banned: boolean;
 }) {
+  const [checked, setChecked] = useState(banned);
+
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    await toggleBan(userId, e.target.checked);
+    const newValue = e.target.checked;
+    setChecked(newValue);
+    await toggleBan(userId, newValue);
   }
 
   return (
     <input
       type="checkbox"
-      defaultChecked={banned}
+      checked={checked}
       onChange={handleChange}
       className="w-4 h-4"
     />
