@@ -22,11 +22,24 @@ export async function POST(req: NextRequest) {
   }
 
   const comment = await prisma.comment.create({
-    data: { userId: user.id, logEntryId, content: content.trim() },
-    include: {
-      user: { select: { id: true, username: true, name: true, avatarUrl: true } },
-    },
-  });
+  data: { userId: user.id, logEntryId, content: content.trim() },
+  include: {
+    user: { select: { id: true, username: true, name: true, avatarUrl: true } },
+    logEntry: { select: { userId: true } }, 
+  },
+});
+
+
+  if (comment.logEntry.userId !== user.id) {
+    await prisma.notification.create({
+      data: {
+        userId: comment.logEntry.userId, 
+        actorId: user.id,             
+        type: "COMMENT",
+        logEntryId,
+      },
+    });
+  }
 
   return NextResponse.json(comment, { status: 201 });
 }

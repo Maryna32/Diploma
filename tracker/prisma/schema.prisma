@@ -89,6 +89,7 @@ model LogEntry {
   updatedAt  DateTime  @updatedAt
 
   reactions Reaction[]
+  notifications Notification[]
 }
 
 model Comment {
@@ -147,8 +148,9 @@ model Notification {
   isRead Boolean @default(false)
 
   createdAt DateTime @default(now())
-
+  logEntryId Int?
   user User @relation(fields: [userId], references: [id])
+  logEntry LogEntry? @relation(fields: [logEntryId], references: [id])
 }
 
 model Reaction {

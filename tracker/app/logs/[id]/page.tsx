@@ -6,7 +6,7 @@ import Link from "next/link";
 import { mediaTypeOptions, statusTypeOptions } from "@/lib/translations";
 import { CalendarDays, Star } from "lucide-react";
 import { CommentsSection } from "@/components/list/CommentsSection";
-
+export const dynamic = "force-dynamic"
 const mediaTypeLabel = Object.fromEntries(mediaTypeOptions.map((o) => [o.value, o.label]));
 const statusTypeLabel = Object.fromEntries(statusTypeOptions.map((o) => [o.value, o.label]));
 
@@ -17,7 +17,7 @@ interface Props {
 export default async function LogDetailsPage({ params }: Props) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
+console.log("USER:", user);
   const id = Number(params.id);
   if (isNaN(id)) notFound();
 
@@ -30,6 +30,7 @@ export default async function LogDetailsPage({ params }: Props) {
       comments: {                  
         include: {
           user: { select: { id: true, username: true, name: true, avatarUrl: true } },
+          reactions: true, 
         },
         orderBy: { createdAt: "asc" },
       },
@@ -105,11 +106,19 @@ export default async function LogDetailsPage({ params }: Props) {
       </div>
       <CommentsSection                                 
         logEntryId={log.id}
+        currentUserId={user?.id}
         initialComments={log.comments.map((c) => ({
           ...c,
           createdAt: c.createdAt.toISOString(),
+          reactions: Object.values(
+            (c.reactions ?? []).reduce((acc, r) => {
+              if (!acc[r.emoji]) acc[r.emoji] = { emoji: r.emoji, count: 0, reacted: false };
+              acc[r.emoji].count++;
+              if (r.userId === user?.id) acc[r.emoji].reacted = true;
+              return acc;
+            }, {} as Record<string, { emoji: string; count: number; reacted: boolean }>)
+          ),
         }))}
-        currentUserId={user?.id}
       />
     </div>
   );
