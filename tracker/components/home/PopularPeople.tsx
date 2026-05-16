@@ -2,46 +2,47 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { Users } from "lucide-react";
 
 interface User {
   id: string;
   username: string;
-  avatarUrl?: string;
-  _count: {
-    followers: number;
-  };
+  name?: string | null;
+  avatarUrl?: string | null;
+  _count: { followers: number };
 }
 
-function PopularPeople({ users }: { users: User[] }) {
-  const getInitials = (username: string) => {
-    return username.slice(0, 2).toUpperCase();
-  };
-
+export default function PopularPeople({ users }: { users: User[] }) {
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Популярні користувачі</h2>
-
-      <div className="grid gap-4">
-        {users.map((user) => (
-          <Link key={user.id} href={`/profile/${user.id}`}>
-            <div className="flex items-center gap-3 p-4 border rounded-xl hover:bg-muted transition cursor-pointer">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={user.avatarUrl || undefined} />
-                <AvatarFallback>{getInitials(user.username)}</AvatarFallback>
-              </Avatar>
-
-              <div>
-                <p className="font-semibold">@{user.username}</p>
-                <p className="text-sm text-gray-500">
-                  Підписників: {user._count.followers}
-                </p>
-              </div>
+    <section className="space-y-3">
+      <h2 className="text-base font-semibold">Популярні користувачі</h2>
+      <div className="border rounded-xl divide-y">
+        {users.map((user, i) => (
+          <Link
+            key={user.id}
+            href={`/profile/${user.id}`}
+            className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
+          >
+            <span className="text-xs text-muted-foreground w-4 shrink-0">{i + 1}</span>
+            <Avatar className="w-8 h-8 shrink-0">
+              <AvatarImage src={user.avatarUrl || undefined} />
+              <AvatarFallback className="text-xs">
+                {user.username.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">@{user.username}</p>
+              {user.name && (
+                <p className="text-xs text-muted-foreground truncate">{user.name}</p>
+              )}
+            </div>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+              <Users className="w-3.5 h-3.5" />
+              {user._count.followers}
             </div>
           </Link>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
-
-export default PopularPeople;
