@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { MessageSquare, Clock, TrendingUp } from "lucide-react";
+import { MessageSquare} from "lucide-react";
 import { mediaTypeOptions } from "@/lib/translations";
 
 export const dynamic = "force-dynamic";
@@ -35,10 +35,8 @@ export default async function TrendsPage() {
     <div className="container max-w-4xl mx-auto py-8 px-4 space-y-8">
       <h1 className="text-2xl font-bold">Тренди</h1>
 
-      {/* Популярні записи */}
       <section className="space-y-3">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <TrendingUp className="w-4 h-4" />
           Популярні записи
         </div>
         <div className="border rounded-xl divide-y">
@@ -66,10 +64,8 @@ export default async function TrendsPage() {
         </div>
       </section>
 
-      {/* Нові записи */}
       <section className="space-y-3">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Clock className="w-4 h-4" />
           Нові записи
         </div>
         <div className="border rounded-xl divide-y">
