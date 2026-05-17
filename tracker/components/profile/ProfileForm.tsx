@@ -131,7 +131,7 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
           />
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-sm">Email</Label>
             <Input
               id="email"
               type="email"
@@ -142,7 +142,7 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label className="text-sm" htmlFor="username">Username</Label>
             <Input
               id="username"
               type="text"
@@ -157,7 +157,7 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name">Ім'я</Label>
+            <Label htmlFor="name" className="text-sm">Ім'я</Label>
             <Input
               id="name"
               type="text"
@@ -169,7 +169,7 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bio">Про себе</Label>
+            <Label htmlFor="bio" className="text-sm">Про себе</Label>
             <Textarea
               id="bio"
               placeholder="Розкажіть про себе..."

@@ -2,28 +2,17 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import FollowButton from "@/components/form/FollowButton";
-import { BookMarked, BookOpen, Film, Tv, GraduationCap, Mic, LayoutGrid } from "lucide-react";
-import { mediaTypeOptions } from "@/lib/translations";
 import { createClient } from "@/lib/supabase/server";
+import { ProfileTabs } from "@/components/profile/ProfileTabs";
 
 interface Props {
   params: { id: string };
 }
 
-const mediaTypeLabel = Object.fromEntries(
-  mediaTypeOptions.map((o) => [o.value, o.label])
-);
-
-const mediaTypeIcon: Record<string, React.ReactNode> = {
-  BOOK: <BookOpen className="w-3.5 h-3.5" />,
-  MOVIE: <Film className="w-3.5 h-3.5" />,
-  SERIES: <Tv className="w-3.5 h-3.5" />,
-  COURSE: <GraduationCap className="w-3.5 h-3.5" />,
-  PODCAST: <Mic className="w-3.5 h-3.5" />,
-  CUSTOM: <LayoutGrid className="w-3.5 h-3.5" />,
-};
-
 export default async function UserProfilePage({ params }: Props) {
+  const supabase = await createClient();
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     include: {
@@ -39,15 +28,29 @@ export default async function UserProfilePage({ params }: Props) {
         orderBy: { createdAt: "desc" },
         take: 20,
       },
+      followers: {
+        include: {
+          follower: {
+            select: { id: true, username: true, name: true, avatarUrl: true },
+          },
+        },
+      },
+      following: {
+        include: {
+          following: {
+            select: { id: true, username: true, name: true, avatarUrl: true },
+          },
+        },
+      },
     },
   });
 
   if (!user) notFound();
 
   const initials = user.username.slice(0, 2).toUpperCase();
-  
-  const supabase = await createClient();
-  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  const followers = user.followers.map((f) => f.follower);
+  const following = user.following.map((f) => f.following);
+
   return (
     <div className="container max-w-3xl mx-auto py-8 px-4 space-y-4">
       <div className="border rounded-xl overflow-hidden">
@@ -83,6 +86,7 @@ export default async function UserProfilePage({ params }: Props) {
               Користувач не додав біо.
             </p>
           )}
+
           <div className="flex gap-5 text-sm">
             <span>
               <span className="font-semibold">{user._count.followers}</span>{" "}
@@ -100,36 +104,16 @@ export default async function UserProfilePage({ params }: Props) {
         </div>
       </div>
 
-      <div className="border rounded-xl">
-        <div className="px-6 py-4 border-b">
-          <h2 className="font-semibold">Публічні записи</h2>
-        </div>
-
-        {user.logEntries.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
-            <BookMarked className="w-10 h-10 opacity-40" />
-            <p className="text-sm">Ще немає публічних записів</p>
-          </div>
-        ) : (
-          <div className="divide-y">
-            {user.logEntries.map((log) => (
-              <div
-                key={log.id}
-                className="flex items-center justify-between px-6 py-3.5 hover:bg-muted/40 transition-colors"
-              >
-                <p className="text-sm font-medium leading-snug">{log.title}</p>
-                {log.mediaType && (
-                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full shrink-0 ml-4">
-                    {mediaTypeIcon[log.mediaType]}
-                    {mediaTypeLabel[log.mediaType] ?? log.mediaType}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
+      <ProfileTabs
+        logs={user.logEntries.map((l) => ({
+          ...l,
+          createdAt: l.createdAt.toISOString(),
+          updatedAt: l.updatedAt.toISOString(),
+        }))}
+        followers={followers}
+        following={following}
+        currentUserId={currentUser?.id}
+      />
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const protectedRoutes = ["/my-log", "/stats", "/profile", "/notifications"];
+const protectedRoutes = ["/my-log", "/stats", "/notifications"];
+const ownProfileRoute = "/profile";
 const adminRoutes = ["/admin"];
 
 export async function middleware(request: NextRequest) {
@@ -19,40 +20,37 @@ export async function middleware(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
+            request.cookies.set(name, value)
           );
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
+            response.cookies.set(name, value, options)
           );
         },
       },
-    },
+    }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route),
-  );
-  const isAdminRoute = adminRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route),
-  );
+  const pathname = request.nextUrl.pathname;
 
-  if (isProtectedRoute && !user) {
+  const isProtectedRoute = protectedRoutes.some((r) => pathname.startsWith(r));
+  const isOwnProfile = pathname === ownProfileRoute;
+  const isAdminRoute = adminRoutes.some((r) => pathname.startsWith(r));
+
+  if ((isProtectedRoute || isOwnProfile) && !user) {
     return NextResponse.redirect(new URL("/auth", request.url));
   }
 
-  if (request.nextUrl.pathname === "/auth" && user) {
+  if (pathname === "/auth" && user) {
     return NextResponse.redirect(new URL("/", request.url));
   }
+
   if (isAdminRoute) {
     if (!user) {
       return NextResponse.redirect(new URL("/auth", request.url));
     }
-
     const { data: userData } = await supabase
       .from("User")
       .select("role, bannedUntil")
@@ -64,13 +62,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/banned", request.url));
       }
     }
-
     if (userData?.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
-  if (isProtectedRoute && user) {
+  if ((isProtectedRoute || isOwnProfile) && user) {
     const { data: userData } = await supabase
       .from("User")
       .select("bannedUntil")
