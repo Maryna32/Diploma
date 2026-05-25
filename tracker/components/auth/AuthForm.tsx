@@ -53,10 +53,23 @@ export default function AuthForm() {
         router.refresh();
       }
     } catch (error: any) {
-      setMessage(error.message || "Сталася помилка");
-    } finally {
-      setLoading(false);
-    }
+        if (error.message?.toLowerCase().includes("email rate limit exceeded")) {
+          setMessage(
+            "Забагато спроб реєстрації. Спробуйте ще раз приблизно через годину."
+          );
+        } 
+        
+        else if (error.message?.toLowerCase().includes("invalid login credentials")) {
+          setMessage(
+            "Неправильний логін або пароль."
+          );
+        }
+        else {
+          setMessage(error.message || "Сталася помилка");
+        }
+      } finally {
+        setLoading(false);
+      }
   };
 
   return (
