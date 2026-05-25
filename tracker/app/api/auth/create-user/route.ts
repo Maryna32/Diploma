@@ -40,9 +40,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ user: newUser });
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Помилка при створенні користувача:", error);
     return NextResponse.json(
-      { error: "Failed to create user" },
+      { error: "Не вийшло створити користувача!" },
       { status: 500 }
     );
   }
