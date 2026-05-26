@@ -151,7 +151,7 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
                   </AvatarFallback>
                 </Avatar>
               </Link>
-              <div className="space-y-1 flex-1">
+              <div className="space-y-1 flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <Link
                     href={`/profile/${c.user.id}`}
@@ -184,7 +184,7 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
                     ) : null}
                   </div>
                 </div>
-                <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-hidden">
                   {c.content}
                   </p>
                 <div className="flex flex-wrap items-center gap-1">
