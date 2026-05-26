@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { X } from "lucide-react";
 
 type Props = {
   value?: number;
@@ -25,8 +26,14 @@ export default function StarRating({
     onChange?.(v);
   };
 
+  const handleClear = () => {
+    if (readOnly) return;
+    setRating(0);
+    onChange?.(0);
+  };
+
   return (
-    <div className="flex gap-1">
+    <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
@@ -50,6 +57,16 @@ export default function StarRating({
           />
         </svg>
       ))}
+      {!readOnly && rating > 0 && (
+        <button
+          type="button"
+          onClick={handleClear}
+          className="ml-1 text-muted-foreground hover:text-foreground transition-colors"
+          title="Скинути оцінку"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }
