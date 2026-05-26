@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import Link from "next/link";
-import { Flag } from "lucide-react";
+import { Flag, X } from "lucide-react";
 
 const EMOJIS = ["❤️", "👍", "👎", "😂", "😮", "🤷‍♀️"];
 
@@ -50,6 +50,17 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
   const [reportReason, setReportReason] = useState("");
   const [reportLoading, setReportLoading] = useState(false);
   const [reportSent, setReportSent] = useState(false);
+
+
+  async function handleDelete(commentId: number) {
+    const res = await fetch(`/api/comments/${commentId}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+    }
+  }
 
   async function handleSubmit() {
     if (!content.trim()) return;
@@ -148,17 +159,34 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
                   >
                     @{c.user.username}
                   </Link>
-                  {currentUserId && currentUserId !== c.user.id && (
-                    <button
-                      onClick={() => setReportTarget({ commentId: c.id, userId: c.user.id })}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
-                      title="Поскаржитись"
-                    >
-                      <Flag className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1">
+                    {currentUserId === c.user.id ? (
+                      <button
+                        onClick={() => handleDelete(c.id)}
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                        title="Видалити коментар"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    ) : currentUserId ? (
+                      <button
+                        onClick={() =>
+                          setReportTarget({
+                            commentId: c.id,
+                            userId: c.user.id,
+                          })
+                        }
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                        title="Поскаржитись"
+                      >
+                        <Flag className="w-3.5 h-3.5" />
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
-                <p className="text-sm leading-relaxed">{c.content}</p>
+                <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                  {c.content}
+                  </p>
                 <div className="flex flex-wrap items-center gap-1">
                   {c.reactions.map((r) => (
                     <button
@@ -195,12 +223,16 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
         {currentUserId ? (
           <div className="space-y-2 pt-2 border-t">
             <Textarea
+              maxLength={500}
               placeholder="Написати коментар..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={2}
-              className="resize-none text-sm"
+              className="resize-none text-sm min-h-[80px] max-h-[200px] overflow-y-auto"
             />
+            <div className="text-xs text-muted-foreground text-right">
+              {content.length}/500
+            </div>
             <Button size="sm" onClick={handleSubmit} disabled={loading || !content.trim()}>
               {loading ? "Надсилання..." : "Надіслати"}
             </Button>
