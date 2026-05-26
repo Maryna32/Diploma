@@ -56,12 +56,12 @@ export default function ProfilePageClient({ user, followers = [], following = []
               )}
             </Avatar>
             <div>
-              <p className="text-xl font-semibold">{user.name || "Без імені"}</p>
-              <p className="text-muted-foreground">@{user.username}</p>
+              <p className="text-xl font-semibold break-words">{user.name || "Без імені"}</p>
+              <p className="text-sm font-medium truncate">@{user.username}</p>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground break-words whitespace-pre-wrap">
             {user.bio || "Користувач не додав біо."}
           </p>
           <Button onClick={() => setEditing(true)}>Редагувати профіль</Button>

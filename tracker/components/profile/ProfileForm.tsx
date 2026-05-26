@@ -36,6 +36,11 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<{
+      username?: string;
+      name?: string;
+      bio?: string;
+  }>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -56,6 +61,32 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
 
     if (noChanges) {
       setMessage("Змін немає — зберігати нічого");
+      return;
+    }
+
+    setMessage("");
+    const newErrors: typeof errors = {};
+
+    if (username.length < 3 || username.length > 24) {
+      newErrors.username = "Username має бути від 3 до 24 символів";
+    }
+
+    if (!/^[a-z0-9_]+$/.test(username)) {
+      newErrors.username =
+        "Тільки малі літери, цифри та підкреслення";
+    }
+
+    if (name.length > 40) {
+      newErrors.name = "Ім'я не може бути довшим за 40 символів";
+    }
+
+    if (bio.length > 500) {
+      newErrors.bio = "Біо не може бути довшим за 500 символів";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
@@ -98,6 +129,7 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
     setBio(user.bio || "");
     setAvatarUrl(user.avatarUrl || "");
     setMessage("");
+    setErrors({});
     if (onClose) onClose();
   };
 
@@ -148,12 +180,32 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
               type="text"
               placeholder="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase())}
+              onChange={(e) => {
+                setUsername(e.target.value.toLowerCase());
+
+                if (errors.username) {
+                  setErrors((prev) => ({
+                    ...prev,
+                    username: undefined,
+                  }));
+                }
+              }}
               required
               disabled={loading}
               pattern="[a-z0-9_]+"
               title="Тільки малі літери, цифри та підкреслення"
+              minLength={3}
+              maxLength={24}
+              className={errors.username ? "border-red-500" : ""}
             />
+            {errors.username && (
+              <p className="text-sm text-red-500">
+                {errors.username}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              {username.length}/24 символів
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -163,9 +215,28 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
               type="text"
               placeholder="Ваше ім'я"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+
+                if (errors.name) {
+                  setErrors((prev) => ({
+                    ...prev,
+                    name: undefined,
+                  }));
+                }
+              }}
               disabled={loading}
+              maxLength={40}
+              className={errors.name ? "border-red-500" : ""}
             />
+            {errors.name && (
+              <p className="text-sm text-red-500">
+                {errors.name}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              {name.length}/40 символів
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -174,16 +245,41 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
               id="bio"
               placeholder="Розкажіть про себе..."
               value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              onChange={(e) => {
+                setBio(e.target.value);
+
+                if (errors.bio) {
+                  setErrors((prev) => ({
+                    ...prev,
+                    bio: undefined,
+                  }));
+                }
+              }}
               disabled={loading}
               rows={4}
               maxLength={500}
+              className={errors.bio ? "border-red-500" : ""}
             />
+            {errors.bio && (
+              <p className="text-sm text-red-500">
+                {errors.bio}
+              </p>
+            )}
             <p className="text-sm text-muted-foreground">
               {bio.length}/500 символів
             </p>
           </div>
-
+          {message && (
+          <p
+            className={`mt-4 text-sm ${
+              message.includes("успішно")
+                ? "text-green-600"
+                : "text-red-500"
+            }`}
+          >
+            {message}
+          </p>
+        )}
           <div className="flex gap-3">
             <Button
               type="submit"
@@ -203,12 +299,6 @@ export default function ProfileForm({ user, onClose }: ProfileFormProps) {
             </Button>
           </div>
         </form>
-
-        {message && (
-          <p className="mt-4 text-sm text-center text-muted-foreground">
-            {message}
-          </p>
-        )}
       </CardContent>
     </Card>
   );
