@@ -25,6 +25,7 @@ export default function AuthForm() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setMessage("");
 
@@ -67,9 +68,9 @@ export default function AuthForm() {
         else {
           setMessage(error.message || "Сталася помилка");
         }
-      } finally {
+
         setLoading(false);
-      }
+      } 
   };
 
   return (
@@ -128,7 +129,7 @@ export default function AuthForm() {
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading
-              ? "Завантаження..."
+              ? "Вхідnpm run ..."
               : isSignUp
               ? "Зареєструватися"
               : "Увійти"}
