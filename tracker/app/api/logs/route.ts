@@ -20,12 +20,34 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    const { title, mediaType, status, rating, notes, isPublic, coverUrl } =
-      body;
+    const { title, mediaType, status, rating, notes, isPublic, coverUrl } = body;
+
+    const cleanTitle = title?.trim();
+
+    if (!cleanTitle) {
+      return NextResponse.json(
+        { error: "Назва обов'язкова" },
+        { status: 400 },
+      );
+    }
+
+    if (!mediaType) {
+      return NextResponse.json(
+        { error: "Тип обов'язковий" },
+        { status: 400 },
+      );
+    }
+
+    if (!status) {
+      return NextResponse.json(
+        { error: "Статус обов'язковий" },
+        { status: 400 },
+      );
+    }
 
     const log = await prisma.logEntry.create({
       data: {
-        title,
+        title: cleanTitle,
         mediaType,
         status,
         rating,
@@ -64,7 +86,7 @@ export async function GET(req: Request) {
 
     const logs = await prisma.logEntry.findMany({
       where: {
-        userId: user!.id,
+        userId: user.id,
       },
       orderBy: {
         createdAt: "desc",

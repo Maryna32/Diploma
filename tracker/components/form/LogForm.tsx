@@ -61,17 +61,36 @@ export default function LogForm({
 
   const [loading, setLoading] = useState(false);
 
+  const [errors, setErrors] = useState<{
+    title?: string;
+    mediaType?: string;
+    status?: string;
+  } >({});
+
   const handleSubmit = async () => {
-    if (!title || !mediaType || !status) {
-      alert("Заповніть обов'язкові поля");
-      return;
+    const newErrors: typeof errors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "Введіть назву";
     }
+
+    if (!mediaType) {
+      newErrors.mediaType = "Оберіть тип";
+    }
+
+    if (!status) {
+      newErrors.status = "Оберіть статус";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       setLoading(true);
 
       await onSubmit({
-        title,
+        title: title.trim(),
         mediaType,
         status,
         rating,
@@ -98,17 +117,35 @@ export default function LogForm({
             placeholder="Назва"
             maxLength={100}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+            onChange={(e) => {
+              setTitle(e.target.value);
+              
+              if (errors.title) {
+                setErrors((prev) => ({ ...prev, title: undefined }));
+              }
+            }}
+            className={errors.title ? "border-red-500" : ""}
+            />
+            {errors.title && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.title}
+              </p>
+            )}
         </div>
 
         <div>
           <Label>Введіть тип</Label>
           <Select
             value={mediaType}
-            onValueChange={(value) => setMediaType(value as MediaType)}
+            onValueChange={(value) => {
+              setMediaType(value as MediaType);
+
+              if (errors.mediaType) {
+                setErrors((prev) => ({ ...prev, mediaType: undefined }));
+              }
+            }}
           >
-            <SelectTrigger>
+            <SelectTrigger className={errors.mediaType ? "border-red-500" : ""}>
               <SelectValue placeholder="Тип" />
             </SelectTrigger>
             <SelectContent>
@@ -119,15 +156,27 @@ export default function LogForm({
               ))}
             </SelectContent>
           </Select>
+
+          {errors.mediaType && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.mediaType}
+            </p>
+          )}
         </div>
 
         <div>
           <Label>Введіть статус</Label>
           <Select
             value={status}
-            onValueChange={(value) => setStatus(value as StatusType)}
+            onValueChange={(value) => {
+              setStatus(value as StatusType);
+
+              if (errors.status) {
+                setErrors((prev) => ({ ...prev, status: undefined }));
+              }
+            }}
           >
-            <SelectTrigger>
+            <SelectTrigger className={errors.status ? "border-red-500" : ""}>
               <SelectValue placeholder="Статус" />
             </SelectTrigger>
             <SelectContent>
@@ -138,6 +187,11 @@ export default function LogForm({
               ))}
             </SelectContent>
           </Select>
+          {errors.status && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.status}
+            </p>
+          )}
         </div>
 
         <div>
