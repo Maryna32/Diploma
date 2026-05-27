@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import ProfileForm from "@/components/profile/ProfileForm";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Link from "next/link";
+import { FollowListDialog } from "@/components/profile/FollowListDialog";
+import { ProfileTabs } from "@/components/profile/ProfileTabs";
 
 type UserSnippet = {
   id: string;
@@ -22,22 +23,35 @@ type User = {
   bio: string | null;
 };
 
+type Log = {
+  id: number;
+  title: string;
+  mediaType: string;
+  status: string;
+  rating?: number | null;
+  coverUrl?: string | null;
+  isPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Props = {
   user: User;
+  logs: Log[];
+  likedLogs: Log[];
   followers: UserSnippet[];
   following: UserSnippet[];
 };
 
-const TABS = [
-  { key: "followers", label: "Підписники" },
-  { key: "following", label: "Підписки" },
-] as const;
 
-export default function ProfilePageClient({ user, followers = [], following = [] }: Props) {
+export default function ProfilePageClient({
+  user,
+  logs = [],
+  likedLogs = [],
+  followers = [],
+  following = [],
+}: Props) {
   const [editing, setEditing] = useState(false);
-  const [tab, setTab] = useState<"followers" | "following">("followers");
-
-  const list = tab === "followers" ? followers : following;
 
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4 space-y-6">
@@ -71,55 +85,48 @@ export default function ProfilePageClient({ user, followers = [], following = []
       )}
 
       {!editing && (
-        <div className="border rounded-xl overflow-hidden">
-          <div className="flex border-b">
-            {TABS.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`flex-1 py-3 text-sm transition-colors ${
-                  tab === t.key
-                    ? "font-semibold border-b-2 border-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t.label}
-                <span className="ml-1.5 text-xs text-muted-foreground">
-                  ({t.key === "followers" ? followers.length : following.length})
-                </span>
-              </button>
-            ))}
+        <>
+          <div className="flex gap-6 text-sm">
+            <FollowListDialog
+              title="Підписники"
+              users={followers}
+              trigger={
+                <button className="hover:opacity-80 transition">
+                  <span className="font-semibold">
+                    {followers.length}
+                  </span>{" "}
+                  <span className="text-muted-foreground">
+                    підписників
+                  </span>
+                </button>
+              }
+            />
+
+            <FollowListDialog
+              title="Підписки"
+              users={following}
+              trigger={
+                <button className="hover:opacity-80 transition">
+                  <span className="font-semibold">
+                    {following.length}
+                  </span>{" "}
+                  <span className="text-muted-foreground">
+                    підписок
+                  </span>
+                </button>
+              }
+            />
           </div>
 
-          {list.length === 0 ? (
-            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-              {tab === "followers" ? "Ще немає підписників" : "Ще немає підписок"}
-            </div>
-          ) : (
-            <div className="divide-y">
-              {list.map((u) => (
-                <Link
-                  key={u.id}
-                  href={`/profile/${u.id}`}
-                  className="flex items-center gap-3 px-6 py-3.5 hover:bg-muted/40 transition-colors"
-                >
-                  <Avatar className="w-8 h-8 shrink-0">
-                    <AvatarImage src={u.avatarUrl || undefined} />
-                    <AvatarFallback className="text-xs">
-                      {u.username.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">@{u.username}</p>
-                    {u.name && (
-                      <p className="text-xs text-muted-foreground truncate">{u.name}</p>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+          <ProfileTabs
+            logs={logs}
+            likedLogs={likedLogs}
+            followers={followers}
+            following={following}
+            currentUserId={user.id}
+          />
+        </>
+      
       )}
     </div>
   );

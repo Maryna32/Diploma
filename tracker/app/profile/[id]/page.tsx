@@ -104,7 +104,7 @@ export default async function UserProfilePage({ params }: Props) {
         </div>
       </div>
 
-      <ProfileTabs
+      {/* <ProfileTabs
         logs={user.logEntries.map((l) => ({
           ...l,
           createdAt: l.createdAt.toISOString(),
@@ -113,7 +113,7 @@ export default async function UserProfilePage({ params }: Props) {
         followers={followers}
         following={following}
         currentUserId={currentUser?.id}
-      />
+      /> */}
     </div>
   );
 }

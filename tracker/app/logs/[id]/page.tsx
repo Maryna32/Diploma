@@ -40,7 +40,13 @@ console.log("USER:", user);
     },
   });
 
-  if (!log || !log.isPublic) notFound();
+  if (!log) notFound();
+
+  const isOwner = user?.id === log.userId;
+
+  if (!log.isPublic && !isOwner) {
+    notFound();
+  }
 
   const initials = log.user.username.slice(0, 2).toUpperCase();
 
