@@ -19,7 +19,7 @@ interface Props {
 export default async function LogDetailsPage({ params }: Props) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-console.log("USER:", user);
+
   const id = Number(params.id);
   if (isNaN(id)) notFound();
 
@@ -101,7 +101,20 @@ console.log("USER:", user);
             </span>
           </Link>
 
-          <h1 className="text-2xl font-bold leading-tight">{log.title}</h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-2xl font-bold leading-tight break-words">
+              {log.title}
+            </h1>
+
+            {user?.id === log.userId && (
+              <Link
+                href={`/edit-log/${log.id}`}
+                className="shrink-0 rounded-md border px-2.5 py-1 text-xs hover:bg-muted transition-colors"
+              >
+                Редагувати
+              </Link>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2">
             <span className="text-xs bg-muted px-3 py-1 rounded-full text-muted-foreground">
               {mediaTypeLabel[log.mediaType] ?? log.mediaType}

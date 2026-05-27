@@ -59,7 +59,8 @@ export default function EditLog() {
         });
 
         if (!response.ok) throw new Error();
-        router.push("/my-log");
+          router.push(`/logs/${id}`);
+          router.refresh();
       }}
     />
   );
