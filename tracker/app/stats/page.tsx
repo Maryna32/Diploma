@@ -40,9 +40,6 @@ export default async function StatsPage() {
   const planned = entries.filter((e) => e.status === "TO_CONSUME").length;
 
   const rated = entries.filter((e) => e.rating !== null);
-  const avgRating = rated.length > 0
-    ? (rated.reduce((sum, e) => sum + (e.rating ?? 0), 0) / rated.length).toFixed(1)
-    : null;
 
   const byType = mediaTypeOptions.map((opt) => ({
     label: opt.label,
@@ -99,12 +96,11 @@ export default async function StatsPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
               { icon: BookMarked, label: "Всього", value: total, color: "text-foreground" },
               { icon: CheckCircle, label: "Завершено", value: completed, color: "text-green-500" },
               { icon: Clock, label: "В процесі", value: inProgress, color: "text-blue-500" },
-              { icon: Star, label: "Середня оцінка", value: avgRating ?? "—", color: "text-amber-500" },
             ].map(({ icon: Icon, label, value, color }) => (
               <div key={label} className="border rounded-xl p-4 space-y-1">
                 <div className="flex items-center gap-2">
