@@ -129,7 +129,7 @@ export default function AuthForm() {
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading
-              ? "Вхідnpm run ..."
+              ? "Вхід..."
               : isSignUp
               ? "Зареєструватися"
               : "Увійти"}
