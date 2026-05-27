@@ -6,6 +6,8 @@ import Link from "next/link";
 import { mediaTypeOptions, statusTypeOptions } from "@/lib/translations";
 import { CalendarDays, Star } from "lucide-react";
 import { CommentsSection } from "@/components/list/CommentsSection";
+import { Reactions } from "@/components/list/Reactions";
+
 export const dynamic = "force-dynamic"
 const mediaTypeLabel = Object.fromEntries(mediaTypeOptions.map((o) => [o.value, o.label]));
 const statusTypeLabel = Object.fromEntries(statusTypeOptions.map((o) => [o.value, o.label]));
@@ -27,6 +29,7 @@ console.log("USER:", user);
       user: {
         select: { id: true, username: true, name: true, avatarUrl: true },
       },
+      reactions: true,
       comments: {                  
         include: {
           user: { select: { id: true, username: true, name: true, avatarUrl: true } },
@@ -40,6 +43,26 @@ console.log("USER:", user);
   if (!log || !log.isPublic) notFound();
 
   const initials = log.user.username.slice(0, 2).toUpperCase();
+
+  const groupedReactions = Object.values(
+    (log.reactions ?? []).reduce((acc, r) => {
+      if (!acc[r.emoji]) {
+        acc[r.emoji] = {
+          emoji: r.emoji,
+          count: 0,
+          reacted: false,
+        };
+      }
+
+      acc[r.emoji].count++;
+
+      if (r.userId === user?.id) {
+        acc[r.emoji].reacted = true;
+      }
+
+      return acc;
+    }, {} as Record<string, { emoji: string; count: number; reacted: boolean }>)
+  );
 
   return (
     <div className="container max-w-2xl mx-auto py-8 px-4 space-y-4">
@@ -93,7 +116,12 @@ console.log("USER:", user);
               <p className="text-sm leading-relaxed">{log.notes}</p>
             </div>
           )}
-
+          <Reactions
+              logEntryId={log.id}
+              currentUserId={user?.id}
+              initialReactions={groupedReactions}
+              emojis={["❤️", "💔","🔥", "👍", "👎"]}
+            />
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
             <CalendarDays className="w-3.5 h-3.5" />
             {new Date(log.createdAt).toLocaleDateString("uk-UA", {

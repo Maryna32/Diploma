@@ -13,10 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 import { Flag, X } from "lucide-react";
-
-const EMOJIS = ["❤️", "👍", "👎", "😂", "😮", "🤷‍♀️"];
-
-type ReactionGroup = { emoji: string; count: number; reacted: boolean };
+import { Reactions, type ReactionGroup } from "./Reactions";
 
 type CommentUser = {
   id: string;
@@ -81,33 +78,6 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
     setLoading(false);
   }
 
-  async function handleReaction(commentId: number, emoji: string) {
-    if (!currentUserId) return;
-    setComments((prev) =>
-      prev.map((c) => {
-        if (c.id !== commentId) return c;
-        const existing = c.reactions.find((r) => r.emoji === emoji);
-        let reactions: ReactionGroup[];
-        if (existing?.reacted) {
-          reactions = c.reactions
-            .map((r) => r.emoji === emoji ? { ...r, count: r.count - 1, reacted: false } : r)
-            .filter((r) => r.count > 0);
-        } else if (existing) {
-          reactions = c.reactions.map((r) =>
-            r.emoji === emoji ? { ...r, count: r.count + 1, reacted: true } : r
-          );
-        } else {
-          reactions = [...c.reactions, { emoji, count: 1, reacted: true }];
-        }
-        return { ...c, reactions };
-      })
-    );
-    await fetch("/api/reactions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ commentId, emoji }),
-    });
-  }
 
   async function handleReport() {
     if (!reportTarget || !reportReason.trim()) return;
@@ -187,27 +157,12 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
                 <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-hidden">
                   {c.content}
                   </p>
-                <div className="flex flex-wrap items-center gap-1">
-                  {c.reactions.map((r) => (
-                    <button
-                      key={r.emoji}
-                      onClick={() => handleReaction(c.id, r.emoji)}
-                      className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
-                        r.reacted
-                          ? "bg-primary/10 border-primary/30 text-foreground"
-                          : "bg-muted border-transparent text-muted-foreground hover:border-muted-foreground/30"
-                      }`}
-                    >
-                      {r.emoji} {r.count}
-                    </button>
-                  ))}
-                  {currentUserId && (
-                    <EmojiPicker
-                      onSelect={(emoji) => handleReaction(c.id, emoji)}
-                      reactedEmojis={c.reactions.filter((r) => r.reacted).map((r) => r.emoji)}
-                    />
-                  )}
-                </div>
+                <Reactions
+                    commentId={c.id}
+                    currentUserId={currentUserId}
+                    initialReactions={c.reactions}
+                    emojis={["❤️", "👍", "👎", "😂", "😮", "🤷‍♀️"]}
+                  />
                 <span className="text-xs text-muted-foreground">
                   {new Date(c.createdAt).toLocaleDateString("uk-UA", {
                     day: "numeric",
@@ -280,41 +235,5 @@ export function CommentsSection({ logEntryId, initialComments, currentUserId }: 
         </DialogContent>
       </Dialog>
     </>
-  );
-}
-
-function EmojiPicker({
-  onSelect,
-  reactedEmojis,
-}: {
-  onSelect: (emoji: string) => void;
-  reactedEmojis: string[];
-}) {
-  const [open, setOpen] = useState(false);
-  const available = EMOJIS.filter((e) => !reactedEmojis.includes(e));
-  if (available.length === 0) return null;
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="text-xs px-2 py-0.5 rounded-full border border-dashed border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/60 transition-colors"
-      >
-        +
-      </button>
-      {open && (
-        <div className="absolute bottom-full mb-1 left-0 flex gap-1 bg-popover border rounded-lg p-1.5 shadow-md z-10">
-          {available.map((e) => (
-            <button
-              key={e}
-              onClick={() => { onSelect(e); setOpen(false); }}
-              className="text-base hover:scale-125 transition-transform"
-            >
-              {e}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }
