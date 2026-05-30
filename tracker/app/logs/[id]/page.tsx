@@ -7,6 +7,7 @@ import { mediaTypeOptions, statusTypeOptions } from "@/lib/translations";
 import { CalendarDays, Star } from "lucide-react";
 import { CommentsSection } from "@/components/list/CommentsSection";
 import { Reactions } from "@/components/list/Reactions";
+import SaveButton from "@/components/form/SaveButton";
 
 export const dynamic = "force-dynamic"
 const mediaTypeLabel = Object.fromEntries(mediaTypeOptions.map((o) => [o.value, o.label]));
@@ -27,21 +28,47 @@ export default async function LogDetailsPage({ params }: Props) {
     where: { id },
     include: {
       user: {
-        select: { id: true, username: true, name: true, avatarUrl: true },
-      },
-      reactions: true,
-      comments: {                  
-        include: {
-          user: { select: { id: true, username: true, name: true, avatarUrl: true } },
-          reactions: true, 
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          avatarUrl: true,
         },
-        orderBy: { createdAt: "asc" },
       },
+
+      reactions: true,
+
+      comments: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatarUrl: true,
+            },
+          },
+          reactions: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+
+      savedLogs: user
+        ? {
+            where: {
+              userId: user.id,
+            },
+          }
+        : false,
     },
   });
 
   if (!log) notFound();
-
+  const isSaved =
+    user != null &&
+    log.savedLogs.length > 0;
   const isOwner = user?.id === log.userId;
 
   if (!log.isPublic && !isOwner) {
@@ -135,12 +162,19 @@ export default async function LogDetailsPage({ params }: Props) {
               <p className="text-sm leading-relaxed">{log.notes}</p>
             </div>
           )}
-          <Reactions
+          <div className="flex items-center gap-3 flex-wrap">
+            <Reactions
               logEntryId={log.id}
               currentUserId={user?.id}
               initialReactions={groupedReactions}
-              emojis={["❤️", "💔","🔥", "👍", "👎"]}
+              emojis={["❤️", "💔", "🔥", "👍", "👎"]}
             />
+
+            <SaveButton
+              logId={log.id}
+              initialSaved={isSaved}
+            />
+          </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
             <CalendarDays className="w-3.5 h-3.5" />
             {new Date(log.createdAt).toLocaleDateString("uk-UA", {

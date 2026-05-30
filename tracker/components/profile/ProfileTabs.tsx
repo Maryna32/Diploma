@@ -60,12 +60,14 @@ interface Props {
   likedLogs: Log[];
   followers: UserSnippet[];
   following: UserSnippet[];
+  savedLogs: Log[];
   currentUserId?: string;
 }
 
 const TABS = [
   { key: "logs", label: "Записи" },
   { key: "liked", label: "Вподобані" },
+  { key: "savedLogs", label: "Збережені" },
 ] as const;
 
 export function ProfileTabs({
@@ -74,8 +76,11 @@ export function ProfileTabs({
   followers,
   following,
   currentUserId,
+  savedLogs
 }: Props) {
-  const [tab, setTab] = useState<"logs" | "liked">("logs");
+  const [tab, setTab] = useState<
+    "logs" | "liked" | "savedLogs"
+  >("logs");
 
   return (
     <div className="border rounded-xl overflow-hidden">
@@ -95,6 +100,7 @@ export function ProfileTabs({
             <span className="ml-1.5 text-xs text-muted-foreground">
               {t.key === "logs" && `(${logs.length})`}
               {t.key === "liked" && `(${likedLogs.length})`}
+              {t.key === "savedLogs" && `(${savedLogs.length})`}
             </span>
           </button>
         ))}
@@ -112,6 +118,14 @@ export function ProfileTabs({
           logs={likedLogs}
           emptyText="Ще немає вподобаних записів"
           icon={<Heart className="w-10 h-10 opacity-40" />}
+        />
+      )}
+
+      {tab === "savedLogs" && (
+        <LogsList
+          logs={savedLogs}
+          emptyText="Ще немає збережених записів"
+          icon={<BookMarked className="w-10 h-10 opacity-40" />}
         />
       )}
     </div>

@@ -21,6 +21,11 @@ export default async function ProfilePage() {
         },
       },
 
+      savedLogs: {
+        include: {
+          logEntry: true,
+        },
+      },
       followers: {
         include: {
           follower: {
@@ -58,6 +63,7 @@ export default async function ProfilePage() {
         },
       },
     },
+    
   });
 
   if (!user) redirect("/auth");
@@ -66,12 +72,21 @@ export default async function ProfilePage() {
     .map((r) => r.logEntry)
     .filter((log): log is NonNullable<typeof log> => !!log);
 
+  const savedLogs = user.savedLogs
+    .map((s) => s.logEntry)
+    .filter((log): log is NonNullable<typeof log> => !!log);
+    
   return (
     <ProfilePageClient
       user={user}
       followers={user.followers.map((f) => f.follower)}
       following={user.following.map((f) => f.following)}
       likedLogs={likedLogs.map((l) => ({
+        ...l,
+        createdAt: l.createdAt.toISOString(),
+        updatedAt: l.updatedAt.toISOString(),
+      }))}
+      savedLogs={savedLogs.map((l) => ({
         ...l,
         createdAt: l.createdAt.toISOString(),
         updatedAt: l.updatedAt.toISOString(),

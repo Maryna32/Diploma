@@ -33,7 +33,7 @@ type Props = {
   following: UserSnippet[];
   totalLogsCount?: number;
   isOwnProfile?: boolean;
-
+  savedLogs: Log[];
   currentUserId?: string;
 
   onEdit?: () => void;
@@ -46,6 +46,7 @@ export default function ProfileView({
   followers,
   following,
   currentUserId,
+  savedLogs,
   totalLogsCount,
   isOwnProfile = false,
   onEdit,
@@ -155,6 +156,7 @@ export default function ProfileView({
           followers={followers}
           following={following}
           currentUserId={currentUserId}
+          savedLogs={savedLogs}
         />
       </div>
     </div>

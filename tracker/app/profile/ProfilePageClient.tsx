@@ -10,12 +10,14 @@ type Props = {
   likedLogs: any[];
   followers: any[];
   following: any[];
+  savedLogs: any[];
 };
 
 export default function ProfilePageClient({
   user,
   logs,
   likedLogs,
+  savedLogs,
   followers,
   following,
 }: Props) {
@@ -37,6 +39,7 @@ export default function ProfilePageClient({
       likedLogs={likedLogs}
       followers={followers}
       following={following}
+      savedLogs={savedLogs}
       currentUserId={user.id}
       isOwnProfile
       onEdit={() => setEditing(true)}
