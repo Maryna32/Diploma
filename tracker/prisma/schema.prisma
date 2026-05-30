@@ -68,6 +68,8 @@ model User {
 
   notifications Notification[]
   reactions Reaction[]
+
+  savedLogs SavedLog[]
 }
 
 model LogEntry {
@@ -90,6 +92,8 @@ model LogEntry {
 
   reactions Reaction[]
   notifications Notification[]
+
+  savedLogs SavedLog[]
 }
 
 model Comment {
@@ -168,4 +172,16 @@ model Reaction {
   
   @@unique([userId, logEntryId, emoji])
   @@unique([userId, commentId, emoji])
+}
+
+model SavedLog {
+  userId String
+  logEntryId Int
+
+  user User @relation(fields: [userId], references: [id])
+  logEntry LogEntry @relation(fields: [logEntryId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, logEntryId])
 }
