@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, User } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { links } from "../../utlis/links";
@@ -37,9 +37,8 @@ function LinksDropdown({ user }: LinksDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex gap-2 max-w-[100px]">
-          <EllipsisVertical className="w-5 h-5" />
-          <User className="w-5 h-5" />
+        <Button variant="ghost" size="icon">
+          <Menu className="w-5 h-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end" sideOffset={10}>
