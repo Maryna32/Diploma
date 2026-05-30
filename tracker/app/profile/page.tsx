@@ -14,7 +14,6 @@ export default async function ProfilePage() {
 
   const user = await prisma.user.findUnique({
     where: { id: authUser.id },
-
     include: {
       logEntries: {
         orderBy: {
@@ -54,7 +53,6 @@ export default async function ProfilePage() {
             not: null,
           },
         },
-
         include: {
           logEntry: true,
         },
@@ -65,8 +63,8 @@ export default async function ProfilePage() {
   if (!user) redirect("/auth");
 
   const likedLogs = user.reactions
-  .map((r) => r.logEntry)
-  .filter((log): log is NonNullable<typeof log> => !!log);
+    .map((r) => r.logEntry)
+    .filter((log): log is NonNullable<typeof log> => !!log);
 
   return (
     <ProfilePageClient
