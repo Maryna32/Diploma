@@ -29,6 +29,14 @@ export default function AuthForm() {
     setLoading(true);
     setMessage("");
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (isSignUp && !emailRegex.test(email)) {
+      setMessage("Введіть коректну адресу електронної пошти.");
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
