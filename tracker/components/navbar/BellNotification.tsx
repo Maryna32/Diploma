@@ -109,27 +109,31 @@ export default function BellNotification() {
       </Button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border rounded-xl shadow-lg p-3 z-50">
+        <div className="absolute right-0 mt-2 w-80 bg-background border border-border rounded-xl shadow-lg p-3 z-50">
           <div className="flex justify-between items-center mb-2">
             <p className="font-semibold">Сповіщення</p>
 
             <button
               onClick={() => router.push("/notifications")}
-              className="text-xs text-blue-500"
+              className="text-xs text-primary hover:underline"
             >
               Всі
             </button>
           </div>
 
           {notifications.length === 0 ? (
-            <p className="text-sm text-gray-500">Немає сповіщень</p>
+            <p className="text-sm text-muted-foreground">
+              Немає сповіщень
+            </p>
           ) : (
             <div className="space-y-2 max-h-60 overflow-auto">
               {notifications.map((n) => (
                 <div
                   key={n.id}
-                  className={`flex items-center justify-between gap-2 p-2 rounded hover:bg-gray-100 ${
-                    n.isRead ? "text-gray-500" : "font-medium"
+                  className={`flex items-center justify-between gap-2 p-2 rounded transition-colors hover:bg-muted ${
+                    n.isRead
+                      ? "text-muted-foreground"
+                      : "bg-muted/50 font-medium"
                   }`}
                 >
                   <div
@@ -146,7 +150,7 @@ export default function BellNotification() {
 
                   <button
                     onClick={() => deleteNotification(n.id)}
-                    className="text-gray-400 hover:text-red-500"
+                    className="text-muted-foreground hover:text-destructive transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
