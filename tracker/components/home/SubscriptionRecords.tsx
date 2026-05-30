@@ -96,6 +96,11 @@ export default async function SubscriptionRecords() {
                   <span className={`text-xs px-2 py-0.5 rounded-full ${statusTypeColors[entry.status] ?? "bg-muted text-muted-foreground"}`}>
                     {statusTypeLabel[entry.status] ?? entry.status}
                   </span>
+                  {entry.rating !== null && entry.rating !== undefined && (
+                    <span className="text-xs px-2 py-0.5 rounded-full border">
+                      ⭐ {entry.rating}/5
+                    </span>
+                  )}
                 </div>
               </div>
               <span className="text-xs text-muted-foreground shrink-0">
