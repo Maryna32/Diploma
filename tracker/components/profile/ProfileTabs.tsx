@@ -62,13 +62,9 @@ interface Props {
   following: UserSnippet[];
   savedLogs: Log[];
   currentUserId?: string;
+  isOwnProfile?: boolean;
 }
 
-const TABS = [
-  { key: "logs", label: "Записи" },
-  { key: "liked", label: "Вподобані" },
-  { key: "savedLogs", label: "Збережені" },
-] as const;
 
 export function ProfileTabs({
   logs,
@@ -76,16 +72,31 @@ export function ProfileTabs({
   followers,
   following,
   currentUserId,
+  isOwnProfile = false,
   savedLogs
 }: Props) {
   const [tab, setTab] = useState<
     "logs" | "liked" | "savedLogs"
   >("logs");
 
+  const tabs: {
+    key: "logs" | "liked" | "savedLogs";
+    label: string;
+  }[] = [
+    { key: "logs", label: "Записи" },
+    { key: "liked", label: "Вподобані" },
+  ];
+
+  if (isOwnProfile) {
+    tabs.push({
+      key: "savedLogs",
+      label: "Збережені",
+    });
+  }
   return (
     <div className="border rounded-xl overflow-hidden">
       <div className="flex border-b overflow-x-auto">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}

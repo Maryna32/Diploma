@@ -157,6 +157,7 @@ export default function ProfileView({
           following={following}
           currentUserId={currentUserId}
           savedLogs={savedLogs}
+          isOwnProfile={isOwnProfile}
         />
       </div>
     </div>

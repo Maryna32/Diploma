@@ -94,6 +94,7 @@ export default async function UserProfilePage({ params }: Props) {
       following={following}
       currentUserId={currentUser?.id}
       totalLogsCount={user._count.logEntries}
+      savedLogs={[]}
       likedLogs={likedLogs.map((l) => ({
         ...l,
         createdAt: l.createdAt.toISOString(),
