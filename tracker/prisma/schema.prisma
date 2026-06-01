@@ -103,7 +103,7 @@ model Comment {
   content String  @db.Text
 
   user User @relation(fields: [userId], references: [id])
-  logEntry LogEntry @relation(fields: [logEntryId], references: [id])
+  logEntry LogEntry @relation(fields: [logEntryId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -139,7 +139,7 @@ model Report {
 
   reporter User @relation("Reporter", fields: [reporterId], references: [id])
   reportedUser User @relation("ReportedUser", fields: [reportedUserId], references: [id])
-  comment Comment? @relation(fields: [commentId], references: [id])
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -154,21 +154,21 @@ model Notification {
   createdAt DateTime @default(now())
   logEntryId Int?
   user User @relation(fields: [userId], references: [id])
-  logEntry LogEntry? @relation(fields: [logEntryId], references: [id])
+  logEntry LogEntry? @relation(fields: [logEntryId], references: [id], onDelete: Cascade)
 }
 
 model Reaction {
-  id         Int      @id @default(autoincrement())
-  userId     String
+  id Int @id @default(autoincrement())
+  userId String
   logEntryId Int?
-  commentId  Int?
-  emoji      String
+  commentId Int?
+  emoji String
   
-  user       User     @relation(fields: [userId], references: [id])
-  logEntry   LogEntry? @relation(fields: [logEntryId], references: [id])
-  comment    Comment?  @relation(fields: [commentId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  logEntry LogEntry? @relation(fields: [logEntryId], references: [id], onDelete: Cascade)
+  comment Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
   
   @@unique([userId, logEntryId, emoji])
   @@unique([userId, commentId, emoji])
@@ -179,7 +179,7 @@ model SavedLog {
   logEntryId Int
 
   user User @relation(fields: [userId], references: [id])
-  logEntry LogEntry @relation(fields: [logEntryId], references: [id])
+  logEntry LogEntry @relation(fields: [logEntryId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
