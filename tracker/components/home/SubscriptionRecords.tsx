@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { mediaTypeOptions, statusTypeOptions } from "@/lib/translations";
 import Link from "next/link";
-import { BookMarked } from "lucide-react";
+import { BookMarked, Star } from "lucide-react";
 
 const mediaTypeLabel = Object.fromEntries(mediaTypeOptions.map((o) => [o.value, o.label]));
 const statusTypeLabel = Object.fromEntries(statusTypeOptions.map((o) => [o.value, o.label]));
@@ -76,19 +76,31 @@ export default async function SubscriptionRecords() {
           const initials = entry.user.username.slice(0, 2).toUpperCase();
           return (
             <div key={entry.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors">
-              <Link href={`/profile/${entry.user.id}`} className="shrink-0">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={entry.user.avatarUrl || undefined} />
-                  <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-                </Avatar>
+              <Link href={`/logs/${entry.id}`} className="shrink-0">
+                {entry.coverUrl ? (
+                  <img
+                    src={entry.coverUrl}
+                    alt={entry.title}
+                    className="w-9 h-12 object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-9 h-12 bg-muted rounded" />
+                )}
               </Link>
+
               <div className="flex-1 min-w-0 space-y-1">
                 <Link href={`/logs/${entry.id}`}>
                   <p className="text-sm font-medium truncate hover:underline">{entry.title}</p>
                 </Link>
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <Link href={`/profile/${entry.user.id}`}>
-                    <span className="text-xs text-muted-foreground hover:underline">@{entry.user.username}</span>
+                  <Link href={`/profile/${entry.user.id}`} className="flex items-center gap-1">
+                    <Avatar className="w-4 h-4">
+                      <AvatarImage src={entry.user.avatarUrl || undefined} />
+                      <AvatarFallback className="text-[9px]">{initials}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs text-muted-foreground hover:underline">
+                      @{entry.user.username}
+                    </span>
                   </Link>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${mediaTypeColors[entry.mediaType] ?? "bg-muted text-muted-foreground"}`}>
                     {mediaTypeLabel[entry.mediaType] ?? entry.mediaType}
@@ -96,19 +108,23 @@ export default async function SubscriptionRecords() {
                   <span className={`text-xs px-2 py-0.5 rounded-full ${statusTypeColors[entry.status] ?? "bg-muted text-muted-foreground"}`}>
                     {statusTypeLabel[entry.status] ?? entry.status}
                   </span>
-                  {entry.rating !== null && entry.rating !== undefined && (
-                    <span className="text-xs px-2 py-0.5 rounded-full border">
-                      ⭐ {entry.rating}/5
-                    </span>
-                  )}
                 </div>
               </div>
-              <span className="text-xs text-muted-foreground shrink-0">
-                {new Date(entry.createdAt).toLocaleDateString("uk-UA", {
-                  day: "numeric",
-                  month: "short",
-                })}
-              </span>
+
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                {entry.rating != null && (
+                  <div className="flex items-center gap-0.5 text-xs text-yellow-500">
+                    <Star className="w-3 h-3 fill-yellow-500" />
+                    <span>{entry.rating}</span>
+                  </div>
+                )}
+                <span className="text-xs text-muted-foreground">
+                  {new Date(entry.createdAt).toLocaleDateString("uk-UA", {
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </span>
+              </div>
             </div>
           );
         })}
