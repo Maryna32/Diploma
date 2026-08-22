@@ -3,6 +3,7 @@
 A full-stack web platform for centrally tracking media content — books, movies, courses, and podcasts — with a social layer of comments, reactions, notifications, and follows.
 
 **Repository:** [github.com/Maryna32/Diploma/tree/main/tracker](https://github.com/Maryna32/Diploma/tree/main/tracker)
+**Live demo:** [diploma-pink.vercel.app](https://diploma-pink.vercel.app/) 
 
 ## Overview
 
